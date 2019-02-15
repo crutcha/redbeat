@@ -116,6 +116,12 @@ def get_redis(app=None):
                                 password=redis_options.get('password'),
                                 decode_responses=True)
             connection = sentinel.master_for(redis_options.get('service_name', 'master'))
+        elif conf.redis_url.startswith('rediss'):
+            ssl_options = { 'ssl_cert_reqs': ssl.CERT_REQUIRED }
+            if conf.redis_use_ssl:
+                ssl_options.update(conf.redis_use_ssl)
+
+            connection = StrictRedis.from_url(conf.redis_url, **ssl_options)
         else:
             connection = StrictRedis.from_url(conf.redis_url, decode_responses=True)
 
@@ -144,6 +150,7 @@ class RedBeatConfig(object):
         self.lock_key = self.either_or('redbeat_lock_key', self.key_prefix + ':lock')
         self.lock_timeout = self.either_or('redbeat_lock_timeout', None)
         self.redis_url = self.either_or('redbeat_redis_url', app.conf['BROKER_URL'])
+        self.redis_use_ssl = self.either_or('redbeat_redis_use_ssl', app.conf['BROKER_USE_SSL'])
 
     @property
     def schedule(self):
