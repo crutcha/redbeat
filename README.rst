@@ -25,6 +25,8 @@ Why RedBeat?
 Getting Started
 ---------------
 
+fake commit
+
 Install with pip:
 
 .. code-block:: console
